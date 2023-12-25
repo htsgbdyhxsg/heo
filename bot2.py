@@ -3,9 +3,9 @@ import telebot,time,random
 from telebot import types
 from gatet import Tele
 import os
-token = '5914232628:AAFX5neYhh5Hb-2nIzK2wPiB_dtQmfKVrrE'
+token = '6329606944:AAFzqKY4OTktWRI2K5SXOZNbqCKV0jcvnw0'
 bot=telebot.TeleBot(token,parse_mode="HTML")
-subscriber ='5670138729'
+subscriber ='6020205067'
 @bot.message_handler(commands=["start"])
 def start(message):
 	if not str(message.chat.id) == subscriber:
