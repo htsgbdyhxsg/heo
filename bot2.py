@@ -117,7 +117,7 @@ def main(message):
 					bot.reply_to(message, msg)
 				else:
 					dd += 1
-				random_number = random.randint(1, 3)
+				random_number = random.randint(1, 25)
 
 				time.sleep(random_number)
 	except Exception as e:
